@@ -27,7 +27,7 @@ For an overview of how Nameless Analytics works [start from here](https://github
   - [Endpoint path](#endpoint-path)
   - [Accept requests from authorized domains only](#accept-requests-from-authorized-domains-only)
   - [Reject requests by IP](#reject-requests-by-ip)
-  - [Reject requests by User Agent](#reject-requests-by-user-agent)
+  - [Enable Bot protection](#enable-bot-protection)
   - [API key for Streaming protocol requests](#api-key-for-streaming-protocol-requests)
     - [Streaming protocol request example](#streaming-protocol-request-example)
 - [Google BigQuery settings](#google-bigquery-settings)
@@ -213,8 +213,8 @@ If the Server-side Google Tag Manager container needs to claim requests from mul
 Reject requests from unauthorized IP addresses. Value accepted IPv4 and IPv6 addresses.
 
 
-### Reject requests by User Agent
-Reject requests by User Agent. The Nameless Analytics Server-side Client Tag filters requests based on a predefined blacklist of values in the `User-Agent` header:
+### Enable Bot protection
+If enabled, the Nameless Analytics Server-side Client Tag filters requests based on a predefined blacklist of values in the `User-Agent` header:
 - **HTTP Libraries:** `curl`, `wget`, `python`, `requests`, `httpie`, `go-http-client`, `java`, `okhttp`, `libwww`, `perl`, `axios`, `node`, `fetch`, `php`, `guzzle`, `ruby`, `faraday`, `rest-client`.
 - **AI Agents & LLMs:** `gptbot`, `chatgpt`, `anthropic`, `claude`, `perplexity`, `bytspider`, `ccbot`.
 - **SEO & Marketing Bots:** `ahrefs`, `semrush`, `dotbot`, `mj12`, `rogerbot`, `bot`, `crawler`, `spider`, `scraper`.
