@@ -1421,18 +1421,25 @@ ___TEMPLATE_PARAMETERS___
       },
       {
         "type": "CHECKBOX",
+        "name": "enable_bot_protection",
+        "checkboxText": "Enable Bot protection",
+        "simpleValueType": true,
+        "alwaysInSummary": true,
+        "help": "If enabled, the Nameless Analytics Server-side Client Tag filters requests based on a predefined blacklist of values in the User-Agent header:\n\u003c/br\u003e\u003c/br\u003e\n\u003cul\u003e\n\u003cli\u003e\u003cb\u003eHTTP Libraries:\u003c/b\u003e curl, wget, python, requests, httpie, go-http-client, java, okhttp, libwww, perl, axios, node, fetch, php, guzzle, ruby, faraday, rest-client.\u003c/li\u003e\u003c/br\u003e\n\u003cli\u003e\u003cb\u003eAI Agents \u0026 LLMs:\u003c/b\u003e gptbot, chatgpt, anthropic, claude, perplexity, bytspider, ccbot.\n\u003c/li\u003e\u003c/br\u003e\n\u003cli\u003e\u003cb\u003eSEO \u0026 Marketing Bots:\u003c/b\u003e ahrefs, semrush, dotbot, mj12, rogerbot, bot, crawler, spider, scraper.\n\u003c/li\u003e\u003c/br\u003e\n\u003cli\u003e\u003cb\u003eAutomation \u0026 Security:\u003c/b\u003e nmap, zgrab, masscan, shodan, headless, phantomjs, selenium, puppeteer, playwright, cypress, electron.\n\u003c/li\u003e\n\u003c/ul\u003e\n\u003c/br\u003e\nRequests with a missing or empty User-Agent header are also automatically rejected."
+      },
+      {
+        "type": "CHECKBOX",
         "name": "add_api_key",
         "checkboxText": "Add API key for Streaming protocol",
         "simpleValueType": true,
         "alwaysInSummary": true,
-        "help": "Add API key for Streaming protocol.",
+        "help": "Enter a secret API key for authorize Streaming protocol requests.",
         "subParams": [
           {
             "type": "TEXT",
             "name": "api_key",
             "displayName": "API key for Streaming protocol requests",
             "simpleValueType": true,
-            "help": "Enter a secret API key for authorize Streaming protocol requests.",
             "alwaysInSummary": true,
             "valueHint": "(not set)",
             "valueValidators": [
@@ -1867,11 +1874,10 @@ if (getRequestPath() === endpoint) {
           return;
         }
 
-        // Check User-Agent header
+        // Check User-Agent header (Bot detection)
         const user_agent = getRequestHeader('User-Agent') || '';
         const request_user_agent = user_agent.toLowerCase();
-        const bad_agents = ["curl", "wget", "python", "requests", "httpie", "go-http-client", "java", "okhttp", "libwww", "perl", "axios", "node", "fetch", "php", "guzzle", "ruby", "faraday", "rest-client", "gptbot", "chatgpt", "anthropic", "claude", "perplexity", "bytspider", "ccbot", "ahrefs", "semrush", "dotbot", "mj12", "rogerbot", "nmap", "zgrab", "masscan", "shodan", "bot", "crawler", "spider", "scraper", "headless", "phantomjs", "selenium", "puppeteer", "playwright", "cypress", "electron"];
-
+        
         if (request_user_agent === '' || request_user_agent === null) {
           message = '🔴 Missing User-Agent header. Request from bot';
           status_code = 403;
@@ -1890,14 +1896,18 @@ if (getRequestPath() === endpoint) {
           return;
         }
 
-        for (var i = 0; i < bad_agents.length; i++) {
-          if (request_user_agent.indexOf(bad_agents[i]) !== -1) {
-            message = '🔴 Invalid User-Agent header value. Request from bot';
-            status_code = 403;
-            if (data.enable_logs) { log(message); }
-
-            claim_request({ event_name: event_name }, status_code, message);
-            return;
+        if (data.enable_bot_protection) {
+          const bad_agents = ["curl", "wget", "python", "requests", "httpie", "go-http-client", "java", "okhttp", "libwww", "perl", "axios", "node", "fetch", "php", "guzzle", "ruby", "faraday", "rest-client", "gptbot", "chatgpt", "anthropic", "claude", "perplexity", "bytspider", "ccbot", "ahrefs", "semrush", "dotbot", "mj12", "rogerbot", "nmap", "zgrab", "masscan", "shodan", "bot", "crawler", "spider", "scraper", "headless", "phantomjs", "selenium", "puppeteer", "playwright", "cypress", "electron"];
+                
+          for (var i = 0; i < bad_agents.length; i++) {
+            if (request_user_agent.indexOf(bad_agents[i]) !== -1) {
+              message = '🔴 Invalid User-Agent header value. Request from bot';
+              status_code = 403;
+              if (data.enable_logs) { log(message); }
+  
+              claim_request({ event_name: event_name }, status_code, message);
+              return;
+            }
           }
         }
 
@@ -2018,7 +2028,9 @@ function check_origin() {
 
   if (data.enable_logs) { log('👉 Endpoint:', endpoint); }
   if (data.enable_logs) { log('👉 Authorized origins:', (data.add_authorized_domains) ? authorized_domains.slice(2) : ' All'); }
-
+  
+  if (data.enable_logs && data.enable_bot_protection) {log('👉 Bot detection enabled'); }
+  
   for (let i = 0; i < authorized_domains_list.length; i++) {
     if (computeEffectiveTldPlusOne(request_origin) == computeEffectiveTldPlusOne(authorized_domains_list[i].authorized_domain)) {
       return true;
