@@ -24,6 +24,9 @@ const computeEffectiveTldPlusOne = require('computeEffectiveTldPlusOne');
 const BigQuery = require('BigQuery');
 const Firestore = require('Firestore');
 const sendHttpRequest = require('sendHttpRequest');
+const createRegex = require('createRegex');
+const testRegex = require('testRegex');
+
 
 
 // ------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -45,7 +48,10 @@ const event_date = event_data.event_date;
 const event_timestamp = event_data.event_timestamp;
 const event_name = event_data.event_name;
 const event_id = event_data.event_id;
-const event_data_obj = event_data.event_data;
+const event_data_obj = event_data.event_data || {};
+if (event_data.event_data) {
+  event_data.event_data.channel_grouping = get_channel_grouping(event_data_obj.source, event_data_obj.campaign);
+}
 
 const event_api_key = getRequestHeader('x-api-key'); // For Streaming protocol 
 const api_key = data.api_key; // For Streaming protocol
@@ -324,6 +330,34 @@ function check_ip() {
       return true;
     }
   }
+}
+
+
+// CHANNEL GROUPING
+function get_channel_grouping(source, campaign) {
+  const patterns = {
+    search_engine: createRegex('360\\.cn|alice|aol|ar\\.search\\.yahoo\\.com|ask|bing|google|yahoo|yandex|baidu|ecosia|duckduckgo|sogou|naver|seznam', 'i'),
+    social: createRegex('facebook|twitter|instagram|pinterest|linkedin|reddit|vk\\.com|tiktok|snapchat|tumblr|wechat|whatsapp', 'i'),
+    shopping: createRegex('amazon|ebay|etsy|shopify|stripe|walmart|mercadolibre|alibaba|naver\\.shopping', 'i'),
+    video: createRegex('youtube|vimeo|netflix|twitch|dailymotion|hulu|disneyplus|wistia|youku', 'i'),
+    ai: createRegex('chatgpt|gemini|bard|claude|alexa|siri|assistant|\\.ai([/]|$)', 'i'),
+    email: createRegex('email|e-mail|newsletter|mailchimp|sendgrid|sparkpost', 'i')
+  };
+
+  if (!source) return 'internal_traffic';
+  if (source === 'direct') return 'direct';
+  if (source === 'tagassistant.google.com') return 'gtm_debugger';
+  if (testRegex(patterns.search_engine, source)) return campaign ? 'paid_search_engine' : 'organic_search_engine';
+  if (testRegex(patterns.social, source)) return campaign ? 'paid_social' : 'organic_social';
+  if (testRegex(patterns.shopping, source)) return campaign ? 'paid_shopping' : 'organic_shopping';
+  if (testRegex(patterns.video, source)) return campaign ? 'paid_video' : 'organic_video';
+  if (testRegex(patterns.ai, source)) return 'ai';
+  if (testRegex(patterns.email, source)) return 'email';
+
+  if (!campaign) return 'referral';
+  if (campaign) return 'affiliate';
+
+  return 'undefined';
 }
 
 
