@@ -162,7 +162,7 @@ if (getRequestPath() === endpoint) {
           return;
         }
 
-        if (event_origin == 'Streaming protocol' && request_user_agent != 'nameless analytics - streaming protocol') {
+        if (event_origin == 'Streaming protocol' && request_user_agent != 'Nameless Analytics - Streaming protocol') {
           message = '🔴 Invalid User-Agent header value. Request from bot';
           if (data.enable_logs) { log(message); }
           status_code = 403;
