@@ -495,7 +495,7 @@ function generate_alphanumeric() {
   var alphanumeric_id = '';
 
   for (var i = 0; i < max_length; i++) {
-    alphanumeric_id += chars.charAt(generateRandom(0, chars.length));
+    alphanumeric_id += chars.charAt(generateRandom(0, chars.length - 1));
   }
 
   return alphanumeric_id;
@@ -745,8 +745,8 @@ function send_to_firestore(event_data) {
           user_country: event_data.event_data.country,
           user_city: event_data.event_data.city,
           user_language: event_data.event_data.browser_language,
-          user_first_session_timestamp: (event_data.event_name == 'page_view') ? event_data.event_timestamp : 'null',
-          user_last_session_timestamp: (event_data.event_name == 'page_view') ? event_data.event_timestamp : 'null',
+          user_first_session_timestamp: (event_data.event_name == 'page_view') ? event_data.event_timestamp : null,
+          user_last_session_timestamp: (event_data.event_name == 'page_view') ? event_data.event_timestamp : null,
           sessions: [{
             session_date: event_data.event_date,
             session_id: event_data.session_id,
@@ -772,7 +772,7 @@ function send_to_firestore(event_data) {
             session_exit_page_category: event_data.page_data.page_category,
             session_exit_page_location: event_data.page_data.page_location,
             session_exit_page_title: event_data.page_data.page_title,
-            session_start_timestamp: (event_data.event_name == 'page_view') ? event_data.event_timestamp : 'null',
+            session_start_timestamp: (event_data.event_name == 'page_view') ? event_data.event_timestamp : null,
             session_end_timestamp: event_data.event_timestamp,
             user_id: event_data.session_data.user_id || null,
             total_events: 1,
