@@ -343,8 +343,9 @@ function get_channel_grouping(source, campaign) {
     email: createRegex('email|e-mail|newsletter|mailchimp|sendgrid|sparkpost', 'i')
   };
 
-  if (!source) return 'internal_traffic';
-  if (source === 'direct') return 'direct';
+  // if (!source) return 'internal_traffic';
+  // if (source === 'direct') return 'direct';
+  if (!source || source === 'direct') return 'direct';
   if (source === 'tagassistant.google.com') return 'gtm_debugger';
   if (testRegex(patterns.search_engine, source)) return campaign ? 'paid_search_engine' : 'organic_search_engine';
   if (testRegex(patterns.social, source)) return campaign ? 'paid_social' : 'organic_social';
