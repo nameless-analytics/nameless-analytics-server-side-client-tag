@@ -80,7 +80,7 @@ These user parameters are reserved and can't be modified:
 - user_last_session_timestamp
 
 #### Add/override user level parameters
-Add or override parameters at user level. Accepted values: strings, integers, floats, and JSON.
+Add or override parameters at user level. Accepted values: strings, integers, floats, JSON and booleans.
 
 These parameters can override:
 - User parameters added in Nameless Analytics Client-side Tracker Configuration Variable
@@ -131,13 +131,13 @@ These session parameters are reserved and can't be modified:
 - total_page_views
 
 #### Add/override User ID parameter
-Add or override User ID parameter at session level. Accepted values: strings, integers, floats, and JSON.
+Add or override User ID parameter at session level. Accepted values: strings, integers, floats, JSON and booleans.
 
 These parameters can override:
 - User ID parameter added in Nameless Analytics Client-side Tracker Configuration Variable
 
 #### Add/override session level parameters
-Add or override session level parameters. Accepted values: strings, integers, floats, and JSON.
+Add or override session level parameters. Accepted values: strings, integers, floats, JSON and booleans.
 
 These parameters can override:
 - Session parameters added in Nameless Analytics Client-side Tracker Configuration Variable
@@ -182,7 +182,7 @@ These event parameters are reserved and can't be modified:
 - country
 
 #### Add/override event level parameters
-Add or overwrite parameters for a specific event. Accepted values: strings, integers, floats, and JSON.
+Add or overwrite parameters for a specific event. Accepted values: strings, integers, floats, JSON and booleans.
 
 These parameters can override:
 - Event parameters added in the Nameless Analytics Client-side Tracker Tag
@@ -211,7 +211,7 @@ If the Server-side Google Tag Manager container needs to claim requests from mul
 
 
 ### Reject requests by IP
-Reject requests from unauthorized IP addresses. Value accepted IPv4 and IPv6 addresses.
+Reject requests from unauthorized IP addresses. Accepted values IPv4 and IPv6 addresses.
 
 
 ### Enable Bot protection
