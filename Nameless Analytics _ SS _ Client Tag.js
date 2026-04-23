@@ -117,7 +117,7 @@ if (getRequestPath() === endpoint) {
 
         // REFUSE REQUESTS
         // Check request for get_user_data
-        if (event_name === 'get_user_data' && event_origin !== 'Website' && event_name !== 'Streaming protocol') {
+        if (event_name === 'get_user_data' && event_origin !== 'Website' && event_origin !== 'Streaming protocol') {
           message = '🔴 Invalid event_origin parameter value. Accepted values: Website';
           status_code = 403;
 
