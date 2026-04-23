@@ -68,11 +68,16 @@ const session_cookie_value = getCookieValues(session_cookie_name)[0];
 
 
 // Validate cookie format
-function validate_cookies(user_cookie, session_cookie) {
-  if (!user_cookie || !session_cookie) return false;
-  const user_pattern = createRegex('^[A-Za-z0-9]{15}$');
-  const session_pattern = createRegex('^[A-Za-z0-9]{15}_[A-Za-z0-9]{15}-[A-Za-z0-9]{15}$');
-  return testRegex(user_pattern, user_cookie) && testRegex(session_pattern, session_cookie);
+function validate_user_cookie(cookie) {
+  if (!cookie) return true;
+  const pattern = createRegex('^[A-Za-z0-9]{15}$');
+  return testRegex(pattern, cookie);
+}
+
+function validate_session_cookie(cookie) {
+  if (!cookie) return true;
+  const pattern = createRegex('^[A-Za-z0-9]{15}_[A-Za-z0-9]{15}-[A-Za-z0-9]{15}$');
+  return testRegex(pattern, cookie);
 }
 
 
@@ -242,7 +247,7 @@ if (getRequestPath() === endpoint) {
         }
 
         // Check if cookie format is valid
-        if (user_cookie_value && session_cookie_value && !validate_cookies(user_cookie_value, session_cookie_value)) {
+        if (!validate_user_cookie(user_cookie_value) || !validate_session_cookie(session_cookie_value)) {
           message = '🔴 Invalid cookie format';
           status_code = 403;
 
