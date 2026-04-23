@@ -275,8 +275,8 @@ The following success messages indicate a correct implementation and data delive
 | **Scope** | **Message** | **Description** |
 |:---|:---|:---|
 | Data validation | 🟢 Request correct | The incoming request passed all validation checks |
-| | 🟢 Request correct, user and session cookie found. Cross-domain link decoration will be applied | Success log for `get_user_data` cross-domain requests |
 | | 🟢 Request claimed successfully | Default success message for a fully processed event |
+| Cross-domain | 🟢 Request correct, user and session cookie found. Cross-domain link decoration will be applied | Success log for `get_user_data` cross-domain requests |
 | Data storage | 🟢 User successfully created in Firestore, session successfully added into Firestore | Confirmation that a new user and their first session were persisted |
 | | 🟢 User already in Firestore, session successfully added into Firestore | Confirmation that a new session was added to an existing user |
 | | 🟢 User already in Firestore, session successfully updated into Firestore | Confirmation that an existing session was refreshed |
