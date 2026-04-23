@@ -36,9 +36,15 @@ const endpoint = data.endpoint;
 const request_origin = getRequestHeader('Origin');
 const request_ip = getRemoteAddress();
 const request_method = getRequestMethod();
+var message;
+var status_code;
+
 
 // Event data
 const event_data = JSON.parse(getRequestBody());
+const event_api_key = getRequestHeader('x-api-key'); // For Streaming protocol 
+const api_key = data.api_key; // For Streaming protocol
+
 const page_date = event_data.page_date;
 const page_id = event_data.page_id;
 const page_data_obj = event_data.page_data;
@@ -52,8 +58,6 @@ if (event_data.event_data) {
   event_data.event_data.channel_grouping = get_channel_grouping(event_data_obj.source, event_data_obj.campaign);
 }
 
-const event_api_key = getRequestHeader('x-api-key'); // For Streaming protocol 
-const api_key = data.api_key; // For Streaming protocol
 
 // Cookie values
 const user_cookie_name = (data.change_cookie_prefix) ? data.cookie_prefix + '_na_u' : 'na_u';
@@ -62,19 +66,14 @@ const user_cookie_value = getCookieValues(user_cookie_name)[0];
 const session_cookie_name = (data.change_cookie_prefix) ? data.cookie_prefix + '_na_s' : 'na_s';
 const session_cookie_value = getCookieValues(session_cookie_name)[0];
 
-// Validate cookie format
-function validate_cookie(cookie_value, cookie_type) {
-  if (!cookie_value) return false;
-  const patterns = {
-    user: createRegex('^[A-Za-z0-9]{15}$'),
-    session: createRegex('^[A-Za-z0-9]{15}_[A-Za-z0-9]{15}-[A-Za-z0-9]{15}$')
-  };
-  return testRegex(patterns[cookie_type], cookie_value);
-}
 
-// Response data
-var message;
-var status_code;
+// Validate cookie format
+function validate_cookies(user_cookie, session_cookie) {
+  if (!user_cookie || !session_cookie) return false;
+  const user_pattern = createRegex('^[A-Za-z0-9]{15}$');
+  const session_pattern = createRegex('^[A-Za-z0-9]{15}_[A-Za-z0-9]{15}-[A-Za-z0-9]{15}$');
+  return testRegex(user_pattern, user_cookie) && testRegex(session_pattern, session_cookie);
+}
 
 
 // Check request endpoint
@@ -235,6 +234,16 @@ if (getRequestPath() === endpoint) {
         // Check if session cookie is missing
         if (event_origin === 'Website' && event_data.event_name !== 'page_view' && event_data.event_name !== 'get_user_data' && session_cookie_value === undefined) {
           message = '🔴 Orphan event: missing session cookie. Trigger a page_view event first to create a new session';
+          status_code = 403;
+
+          if (data.enable_logs) { log(message); }
+          claim_request({ event_name: event_name }, status_code, message);
+          return;
+        }
+
+        // Check if cookie format is valid
+        if (user_cookie_value && session_cookie_value && !validate_cookies(user_cookie_value, session_cookie_value)) {
+          message = '🔴 Invalid cookie format';
           status_code = 403;
 
           if (data.enable_logs) { log(message); }
