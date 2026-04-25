@@ -792,9 +792,7 @@ function send_to_firestore(event_data) {
             session_exit_page_title: event_data.page_data.page_title,
             session_start_timestamp: (event_data.event_name === 'page_view') ? event_data.event_timestamp : null,
             session_end_timestamp: event_data.event_timestamp,
-            user_id: event_data.session_data.user_id || null,
-            total_page_views: 1,
-            total_events: 1
+            user_id: event_data.session_data.user_id || null
           }]
         };
 
@@ -838,9 +836,6 @@ function send_to_firestore(event_data) {
 
               Object.delete(event_data.session_data, 'session_date');
               Object.delete(event_data.session_data, 'session_id');
-
-              // Add page and event parameters for BigQuery
-              event_data.event_data.event_number = event_data.session_data.total_events;
 
               return { status: true, status_code: 200, message: '🟢 Request claimed successfully' };
             },
@@ -941,9 +936,7 @@ function send_to_firestore(event_data) {
             session_exit_page_title: event_data.page_data.page_title,
             session_start_timestamp: (event_data.event_name === 'page_view') ? event_data.event_timestamp : null,
             session_end_timestamp: event_data.event_timestamp,
-            user_id: event_data.session_data.user_id || null,
-            total_page_views: 1,
-            total_events: 1
+            user_id: event_data.session_data.user_id || null
           };
 
           // Add session parameters for Firestore
@@ -970,9 +963,6 @@ function send_to_firestore(event_data) {
 
                 Object.delete(event_data.session_data, 'session_date');
                 Object.delete(event_data.session_data, 'session_id');
-
-                // Add page and event parameters for BigQuery
-                event_data.event_data.event_number = event_data.session_data.total_events;
 
                 return { status: true, status_code: 200, message: '🟢 Request claimed successfully' };
               },
@@ -1017,9 +1007,7 @@ function send_to_firestore(event_data) {
             "session_exit_page_title",
             "session_start_timestamp",
             "session_end_timestamp",
-            "user_id",
-            "total_page_views",
-            "total_events"
+            "user_id"
           ];
 
           Object.keys(event_data.session_data).forEach(function (key) {
@@ -1044,8 +1032,6 @@ function send_to_firestore(event_data) {
 
           if (event_data.event_name === 'login') { last_session.user_id = event_data.session_data.user_id; }
           if (event_data.event_name === 'logout') { last_session.user_id = null; }
-          last_session.total_events = (last_session.total_events || 0) + 1;
-          if (event_data.event_name === 'page_view') { last_session.total_page_views = (last_session.total_page_views || 0) + 1; }
 
           // Send data to firestore                    
           if (data.enable_logs) { log('👉 Payload to send: ', firestore_data); }
@@ -1061,9 +1047,6 @@ function send_to_firestore(event_data) {
 
                 Object.delete(event_data.session_data, 'session_date');
                 Object.delete(event_data.session_data, 'session_id');
-
-                // Add page and event parameters for BigQuery
-                event_data.event_data.event_number = event_data.session_data.total_events;
 
                 return { status: true, status_code: 200, message: '🟢 Request claimed successfully' };
               },
