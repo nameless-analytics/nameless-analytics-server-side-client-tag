@@ -816,7 +816,7 @@ function send_to_firestore(event_data) {
         return Firestore.write(document_path, firestore_data, { projectId: projectId, merge: true })
           .then(
             (id) => {
-              if (data.enable_logs) { log('🟢 User successfully created in Firestore, session successfully added into Firestore'); }
+              if (data.enable_logs) { log('🟢 User successfully created in Firestore, session successfully added to Firestore'); }
 
               // Add user parameters to Big Query        
               for (var key in firestore_data) {
@@ -840,7 +840,7 @@ function send_to_firestore(event_data) {
               return { status: true, status_code: 200, message: '🟢 Request claimed successfully' };
             },
             () => {
-              message = '🔴 User or session data not created in Firestore';
+              message = '🔴 User or session data not created to Firestore';
               status_code = 403;
 
               if (data.enable_logs) { log(message); }
@@ -955,7 +955,7 @@ function send_to_firestore(event_data) {
           return Firestore.write(document_path, firestore_data, { projectId: projectId, merge: true })
             .then(
               (id) => {
-                if (data.enable_logs) { log('🟢 User already in Firestore, session successfully added into Firestore'); }
+                if (data.enable_logs) { log('🟢 User already in Firestore, session successfully added to Firestore'); }
 
                 // Add data to BigQuery
                 event_data.session_data = firestore_data.sessions.slice(-1)[0];
@@ -967,7 +967,7 @@ function send_to_firestore(event_data) {
                 return { status: true, status_code: 200, message: '🟢 Request claimed successfully' };
               },
               () => {
-                message = '🔴 User or session data not added in Firestore';
+                message = '🔴 User or session data not added to Firestore';
                 status_code = 403;
 
                 if (data.enable_logs) { log(message); }
@@ -1039,7 +1039,7 @@ function send_to_firestore(event_data) {
           return Firestore.write(document_path, firestore_data, { projectId: projectId, merge: true })
             .then(
               (id) => {
-                if (data.enable_logs) { log('🟢 User already in Firestore, session successfully updated into Firestore'); }
+                if (data.enable_logs) { log('🟢 User already in Firestore, session successfully updated to Firestore'); }
 
                 // Add data for BigQuery
                 event_data.session_data = last_session;
@@ -1051,7 +1051,7 @@ function send_to_firestore(event_data) {
                 return { status: true, status_code: 200, message: '🟢 Request claimed successfully' };
               },
               () => {
-                message = '🔴 User or session data not updated in Firestore';
+                message = '🔴 User or session data not updated to Firestore';
                 status_code = 403;
 
                 if (data.enable_logs) { log(message); }
