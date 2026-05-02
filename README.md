@@ -263,7 +263,9 @@ Change the session duration in minutes. Default value: 30 min.
 
 
 ### Enable logs in preview mode
-Enable logs for all events in preview mode. If cross-domain is enabled, all domains will send events in relative preview mode. For more information, see the [Cross-domain section](https://github.com/nameless-analytics/client-side-tracker-configuration-variable/#enable-cross-domain-tracking).
+Enable logs for all events in preview mode. 
+
+If cross-domain is enabled, all cross-domain requests will be visible in each domain's respective GTM Preview Mode. For more information, see the [Cross-domain section](https://github.com/nameless-analytics/client-side-tracker-configuration-variable/#enable-cross-domain-tracking).
 
 
 
