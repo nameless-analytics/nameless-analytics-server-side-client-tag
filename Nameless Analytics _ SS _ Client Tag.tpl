@@ -1759,7 +1759,6 @@ const createRegex = require('createRegex');
 const testRegex = require('testRegex');
 
 
-
 // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -1768,9 +1767,15 @@ const endpoint = data.endpoint;
 const request_origin = getRequestHeader('Origin');
 const request_ip = getRemoteAddress();
 const request_method = getRequestMethod();
+var message;
+var status_code;
+
 
 // Event data
 const event_data = JSON.parse(getRequestBody());
+const event_api_key = getRequestHeader('x-api-key'); // For Streaming protocol 
+const api_key = data.api_key; // For Streaming protocol
+
 const page_date = event_data.page_date;
 const page_id = event_data.page_id;
 const page_data_obj = event_data.page_data;
@@ -1784,19 +1789,27 @@ if (event_data.event_data) {
   event_data.event_data.channel_grouping = get_channel_grouping(event_data_obj.source, event_data_obj.campaign);
 }
 
-const event_api_key = getRequestHeader('x-api-key'); // For Streaming protocol 
-const api_key = data.api_key; // For Streaming protocol
 
-// Cookie data
+// Cookie values
 const user_cookie_name = (data.change_cookie_prefix) ? data.cookie_prefix + '_na_u' : 'na_u';
 const user_cookie_value = getCookieValues(user_cookie_name)[0];
 
 const session_cookie_name = (data.change_cookie_prefix) ? data.cookie_prefix + '_na_s' : 'na_s';
 const session_cookie_value = getCookieValues(session_cookie_name)[0];
 
-// Response data
-var message;
-var status_code;
+
+// Validate cookie format
+function validate_user_cookie(cookie) {
+  if (!cookie) return true;
+  const pattern = createRegex('^[A-Za-z0-9]{15}$');
+  return testRegex(pattern, cookie);
+}
+
+function validate_session_cookie(cookie) {
+  if (!cookie) return true;
+  const pattern = createRegex('^[A-Za-z0-9]{15}_[A-Za-z0-9]{15}-[A-Za-z0-9]{15}$');
+  return testRegex(pattern, cookie);
+}
 
 
 // Check request endpoint
@@ -1810,7 +1823,7 @@ if (getRequestPath() === endpoint) {
 
       if (data.enable_logs) { log('CHECKING REQUEST'); }
 
-      if (event_name == 'get_user_data') {
+      if (event_name === 'get_user_data') {
         if (data.enable_logs) { log('👉 Request type: Get user data'); }
       } else {
         if (data.enable_logs) { log('👉 Request type:', event_origin); }
@@ -1819,9 +1832,6 @@ if (getRequestPath() === endpoint) {
       if (data.enable_logs) { log('👉 Event name: ', event_data.event_name); }
 
       if (request_method === 'POST') {
-        let message;
-        let status_code;
-
         // Check required fields
         const missing_fields = [];
 
@@ -1838,7 +1848,7 @@ if (getRequestPath() === endpoint) {
 
         // REFUSE REQUESTS
         // Check request for get_user_data
-        if (event_name == 'get_user_data' && event_origin != 'Website' && event_name != 'Streaming protocol') {
+        if (event_name === 'get_user_data' && event_origin !== 'Website' && event_origin !== 'Streaming protocol') {
           message = '🔴 Invalid event_origin parameter value. Accepted values: Website';
           status_code = 403;
 
@@ -1848,7 +1858,7 @@ if (getRequestPath() === endpoint) {
         }
 
         // Check if user or session cookie is missing for get_user_data requests
-        if (event_name == 'get_user_data' && (user_cookie_value === undefined || session_cookie_value === undefined)) {
+        if (event_name === 'get_user_data' && (user_cookie_value === undefined || session_cookie_value === undefined)) {
           if (data.enable_logs) { log('👉 Request from get_user_data event'); }
 
           if (data.enable_logs) { log('CHECKING COOKIES'); }
@@ -1871,7 +1881,7 @@ if (getRequestPath() === endpoint) {
         }
 
         // Check event origin 
-        if (event_origin !== 'Website' && event_origin !== 'Streaming protocol' && event_name != 'get_user_data') {
+        if (event_origin !== 'Website' && event_origin !== 'Streaming protocol' && event_name !== 'get_user_data') {
           message = '🔴 Invalid event_origin parameter value. Accepted values: Website or Streaming protocol';
           status_code = 403;
 
@@ -1881,8 +1891,7 @@ if (getRequestPath() === endpoint) {
         }
 
         // Check User-Agent header (Bot detection)
-        const user_agent = getRequestHeader('User-Agent') || '';
-        const request_user_agent = user_agent.toLowerCase();
+        const request_user_agent = getRequestHeader('User-Agent') || '';
         
         if (request_user_agent === '' || request_user_agent === null) {
           message = '🔴 Missing User-Agent header. Request from bot';
@@ -1893,7 +1902,7 @@ if (getRequestPath() === endpoint) {
           return;
         }
 
-        if (event_origin == 'Streaming protocol' && request_user_agent != 'nameless analytics - streaming protocol') {
+        if (event_origin === 'Streaming protocol' && request_user_agent !== 'Nameless Analytics - Streaming protocol') {
           message = '🔴 Invalid User-Agent header value. Request from bot';
           if (data.enable_logs) { log(message); }
           status_code = 403;
@@ -1918,7 +1927,7 @@ if (getRequestPath() === endpoint) {
         }
 
         // Check Streaming protocol requests API key
-        if (event_origin == 'Streaming protocol' && data.add_api_key && event_api_key != api_key) {
+        if (event_origin === 'Streaming protocol' && data.add_api_key && event_api_key !== api_key) {
           message = '🔴 Invalid API key';
           if (data.enable_logs) { log(message); }
           status_code = 403;
@@ -1928,7 +1937,7 @@ if (getRequestPath() === endpoint) {
         }
 
         // Check if page_view is from Streaming protocol
-        if (event_name == 'page_view' && event_origin == 'Streaming protocol') {
+        if (event_name === 'page_view' && event_origin === 'Streaming protocol') {
           message = '🔴 Invalid event_name. Can\'t send page_view from Streaming protocol';
           status_code = 403;
 
@@ -1938,7 +1947,7 @@ if (getRequestPath() === endpoint) {
         }
 
         // Check if some required parameter is missing 
-        if (event_name != 'get_user_data' && missing_fields.length > 0) {
+        if (event_name !== 'get_user_data' && missing_fields.length > 0) {
           message = '🔴 Missing required parameters: '.concat(missing_fields.join(', '));
           if (data.enable_logs) { log(message); }
           status_code = 403;
@@ -1948,7 +1957,7 @@ if (getRequestPath() === endpoint) {
         }
 
         // Check if user cookie is missing
-        if (event_origin == 'Website' && event_data.event_name != 'page_view' && event_data.event_name != 'get_user_data' && user_cookie_value === undefined) {
+        if (event_origin === 'Website' && event_data.event_name !== 'page_view' && event_data.event_name !== 'get_user_data' && user_cookie_value === undefined) {
           message = '🔴 Orphan event: missing user cookie. Trigger a page_view event first to create a new user and a new session';
           status_code = 403;
 
@@ -1958,8 +1967,18 @@ if (getRequestPath() === endpoint) {
         }
 
         // Check if session cookie is missing
-        if (event_origin == 'Website' && event_data.event_name != 'page_view' && event_data.event_name != 'get_user_data' && session_cookie_value === undefined) {
+        if (event_origin === 'Website' && event_data.event_name !== 'page_view' && event_data.event_name !== 'get_user_data' && session_cookie_value === undefined) {
           message = '🔴 Orphan event: missing session cookie. Trigger a page_view event first to create a new session';
+          status_code = 403;
+
+          if (data.enable_logs) { log(message); }
+          claim_request({ event_name: event_name }, status_code, message);
+          return;
+        }
+
+        // Check if cookie format is valid
+        if (!validate_user_cookie(user_cookie_value) || !validate_session_cookie(session_cookie_value)) {
+          message = '🔴 Invalid cookie format';
           status_code = 403;
 
           if (data.enable_logs) { log(message); }
@@ -1969,7 +1988,7 @@ if (getRequestPath() === endpoint) {
 
         // CLAIM REQUESTS 
         // Claim get user data requests
-        if (event_name == 'get_user_data') {
+        if (event_name === 'get_user_data') {
           if (data.enable_logs) { log('🟢 Request correct, user and session cookie found. Cross-domain link decoration will be applied'); }
 
           message = '🟢 Request claimed successfully';
@@ -2027,7 +2046,7 @@ function check_origin() {
   const authorized_domains_list = (data.add_authorized_domains) ? data.authorized_domains_list : [{ authorized_domain: request_origin }];
   var authorized_domains = '';
 
-  for (let i = 0; i < authorized_domains_list.length; i++) {
+  for (var i = 0; i < authorized_domains_list.length; i++) {
     const authorized_domains_tld = computeEffectiveTldPlusOne(authorized_domains_list[i].authorized_domain);
     authorized_domains = authorized_domains.concat(', ', authorized_domains_tld);
   }
@@ -2037,8 +2056,8 @@ function check_origin() {
   
   if (data.enable_logs && data.enable_bot_protection) {log('👉 Bot detection enabled'); }
   
-  for (let i = 0; i < authorized_domains_list.length; i++) {
-    if (computeEffectiveTldPlusOne(request_origin) == computeEffectiveTldPlusOne(authorized_domains_list[i].authorized_domain)) {
+  for (var i = 0; i < authorized_domains_list.length; i++) {
+    if (computeEffectiveTldPlusOne(request_origin) === computeEffectiveTldPlusOne(authorized_domains_list[i].authorized_domain)) {
       return true;
     }
   }
@@ -2050,14 +2069,14 @@ function check_ip() {
   const banned_ip_list = (data.add_banned_ips) ? data.banned_ips_list : [{ banned_ip: null }];
   var banned_ips = '';
 
-  for (let i = 0; i < banned_ip_list.length; i++) {
+  for (var i = 0; i < banned_ip_list.length; i++) {
     banned_ips = banned_ips.concat(', ', banned_ip_list[i].banned_ip);
   }
 
   if (data.enable_logs) { log('👉 Unauthorized IPs:', (data.add_banned_ips) ? banned_ips.slice(2) : 'None'); }
 
-  for (let i = 0; i < banned_ip_list.length; i++) {
-    if (request_ip == banned_ip_list[i].banned_ip) {
+  for (var i = 0; i < banned_ip_list.length; i++) {
+    if (request_ip === banned_ip_list[i].banned_ip) {
       return true;
     }
   }
@@ -2075,8 +2094,9 @@ function get_channel_grouping(source, campaign) {
     email: createRegex('email|e-mail|newsletter|mailchimp|sendgrid|sparkpost', 'i')
   };
 
-  if (!source) return 'internal_traffic';
-  if (source === 'direct') return 'direct';
+  // if (!source) return 'internal_traffic';
+  // if (source === 'direct') return 'direct';
+  if (!source || source === 'direct') return 'direct';
   if (source === 'tagassistant.google.com') return 'gtm_debugger';
   if (testRegex(patterns.search_engine, source)) return campaign ? 'paid_search_engine' : 'organic_search_engine';
   if (testRegex(patterns.social, source)) return campaign ? 'paid_social' : 'organic_social';
@@ -2087,8 +2107,6 @@ function get_channel_grouping(source, campaign) {
 
   if (!campaign) return 'referral';
   if (campaign) return 'affiliate';
-
-  return 'undefined';
 }
 
 
@@ -2122,7 +2140,7 @@ function set_ids(event_data) {
   const cross_domain_id = event_data.event_data.cross_domain_id;
 
   // Cross-domain request
-  if (event_origin == 'Website' && cross_domain_id) {
+  if (event_origin === 'Website' && cross_domain_id) {
     const cross_domain_client_id = cross_domain_id.split('_')[0];
     const cross_domain_session_id = cross_domain_id;
 
@@ -2131,7 +2149,7 @@ function set_ids(event_data) {
     // With an active session
     if (session_cookie_value) {
       // With different session id
-      if (cross_domain_session_id != session_cookie_value.split('-')[0]) {
+      if (cross_domain_session_id !== session_cookie_value.split('-')[0]) {
         event_data.client_id = cross_domain_client_id;
         event_data.session_id = cross_domain_session_id;
         event_data.page_id = cross_domain_session_id + '-' + page_id;
@@ -2183,7 +2201,7 @@ function set_ids(event_data) {
       if (data.enable_logs) { log('👉 Create new client_id: ', new_client_id + ' and new session_id: ', new_session_id); }
 
       // Returning user
-    } else if (user_cookie_value != undefined) {
+    } else if (user_cookie_value !== undefined) {
       // No session cookie
       if (session_cookie_value === undefined) {
         const old_client_id = user_cookie_value;
@@ -2226,7 +2244,7 @@ function generate_alphanumeric() {
   var alphanumeric_id = '';
 
   for (var i = 0; i < max_length; i++) {
-    alphanumeric_id += chars.charAt(generateRandom(0, chars.length));
+    alphanumeric_id += chars.charAt(generateRandom(0, chars.length - 1));
   }
 
   return alphanumeric_id;
@@ -2255,7 +2273,7 @@ function build_payload(event_data) {
   // User data
   // Add or override user ID
   if (data.override_user_id) {
-    event_data.session_data.user_id = (data.user_id == "null") ? null : data.user_id;
+    event_data.session_data.user_id = (data.user_id === "null") ? null : data.user_id;
   }
 
   // Add user data from tag fields
@@ -2263,7 +2281,7 @@ function build_payload(event_data) {
     const user_params = data.user_params_to_add;
 
     if (user_params !== undefined) {
-      for (let i = 0; i < user_params.length; i++) {
+      for (var i = 0; i < user_params.length; i++) {
         const param_name = user_params[i].param_name;
         const param_value = user_params[i].param_value;
 
@@ -2277,7 +2295,7 @@ function build_payload(event_data) {
     const user_params = data.user_params_to_remove;
 
     if (user_params !== undefined) {
-      for (let i = 0; i < user_params.length; i++) {
+      for (var i = 0; i < user_params.length; i++) {
         const param_name = user_params[i].param_name;
 
         Object.delete(event_data.user_data, param_name);
@@ -2292,7 +2310,7 @@ function build_payload(event_data) {
     const session_params = data.session_params_to_add;
 
     if (session_params !== undefined) {
-      for (let i = 0; i < session_params.length; i++) {
+      for (var i = 0; i < session_params.length; i++) {
         const param_name = session_params[i].param_name;
         const param_value = session_params[i].param_value;
 
@@ -2306,7 +2324,7 @@ function build_payload(event_data) {
     const session_params = data.session_params_to_remove;
 
     if (session_params !== undefined) {
-      for (let i = 0; i < session_params.length; i++) {
+      for (var i = 0; i < session_params.length; i++) {
         const param_name = session_params[i].param_name;
 
         Object.delete(event_data.session_data, param_name);
@@ -2325,7 +2343,7 @@ function build_payload(event_data) {
     const event_params = data.event_params_to_add;
 
     if (event_params !== undefined) {
-      for (let i = 0; i < event_params.length; i++) {
+      for (var i = 0; i < event_params.length; i++) {
         const param_name = event_params[i].param_name;
         const param_value = event_params[i].param_value;
 
@@ -2339,7 +2357,7 @@ function build_payload(event_data) {
     const event_params = data.event_params_to_remove;
 
     if (event_params !== undefined) {
-      for (let i = 0; i < event_params.length; i++) {
+      for (var i = 0; i < event_params.length; i++) {
         const param_name = event_params[i].param_name;
 
         Object.delete(event_data.event_data, param_name);
@@ -2359,7 +2377,7 @@ function claim_request(event_data, status_code, message) {
   claimRequest();
 
   // For error requests and get_user_data requests
-  if ((status_code === 403 || event_data.event_name == 'get_user_data')) {
+  if ((status_code === 403 || event_data.event_name === 'get_user_data')) {
     if (data.enable_logs) { log('REQUEST STATUS'); }
     return_response(event_data, status_code, message);
 
@@ -2378,7 +2396,7 @@ function claim_request(event_data, status_code, message) {
       })
       // Send data to BigQuery
       .then((res) => {
-        if (res.status == true) {
+        if (res.status === true) {
           if (data.enable_logs) { log('SENDING EVENT DATA TO GOOGLE BIGQUERY'); }
           send_to_bq(event_data);
         }
@@ -2386,7 +2404,7 @@ function claim_request(event_data, status_code, message) {
       })
       // Send data to custom endpoint
       .then((res) => {
-        if (res.status == true) {
+        if (res.status === true) {
           if (data.send_data_to_custom_endpoint) {
             if (data.enable_logs) { log('SENDING EVENT DATA TO CUSTOM ENDPOINT'); }
             send_to_custom_endpoint(data.custom_request_endpoint_path, event_data);
@@ -2434,12 +2452,12 @@ function send_to_firestore(event_data) {
     .then((documents) => {
 
       // REJECT REQUESTS (orphan events) 
-      if (event_data.event_name != 'page_view' && documents.length === 0) {
+      if (event_data.event_name !== 'page_view' && documents.length === 0) {
         message = "🔴 Orphan event: user doesn't exist in Firestore. Trigger a page_view event first to create a new user and a new session";
         if (data.enable_logs) { log(message); }
         if (data.enable_logs) { log('REQUEST STATUS'); }
         return { status: false, status_code: 403, message: message };
-      } if (event_data.event_name != 'page_view' && !documents[0].data.sessions.some(s => s.session_id === event_data.session_id)) {
+      } if (event_data.event_name !== 'page_view' && !documents[0].data.sessions.some(s => s.session_id === event_data.session_id)) {
         message = "🔴 Orphan event: session doesn't exist in Firestore. Trigger a page_view event first to create a new session";
         if (data.enable_logs) { log(message); }
         if (data.enable_logs) { log('REQUEST STATUS'); }
@@ -2447,7 +2465,7 @@ function send_to_firestore(event_data) {
       }
 
       // Set cookies
-      if (event_origin == 'Website') {
+      if (event_origin === 'Website') {
         const user_cookie_max_age = 400 * 24 * 60 * 60;
         const session_cookie_max_age = (makeNumber(data.session_max_age) || 30) * 60;
 
@@ -2476,8 +2494,8 @@ function send_to_firestore(event_data) {
           user_country: event_data.event_data.country,
           user_city: event_data.event_data.city,
           user_language: event_data.event_data.browser_language,
-          user_first_session_timestamp: (event_data.event_name == 'page_view') ? event_data.event_timestamp : 'null',
-          user_last_session_timestamp: (event_data.event_name == 'page_view') ? event_data.event_timestamp : 'null',
+          user_first_session_timestamp: (event_data.event_name === 'page_view') ? event_data.event_timestamp : null,
+          user_last_session_timestamp: (event_data.event_name === 'page_view') ? event_data.event_timestamp : null,
           sessions: [{
             session_date: event_data.event_date,
             session_id: event_data.session_id,
@@ -2503,23 +2521,21 @@ function send_to_firestore(event_data) {
             session_exit_page_category: event_data.page_data.page_category,
             session_exit_page_location: event_data.page_data.page_location,
             session_exit_page_title: event_data.page_data.page_title,
-            session_start_timestamp: (event_data.event_name == 'page_view') ? event_data.event_timestamp : 'null',
+            session_start_timestamp: (event_data.event_name === 'page_view') ? event_data.event_timestamp : null,
             session_end_timestamp: event_data.event_timestamp,
-            user_id: event_data.session_data.user_id || null,
-            total_events: 1,
-            total_page_views: 1
+            user_id: event_data.session_data.user_id || null
           }]
         };
 
         // Add user parameters to Firestore
-        for (let key in event_data.user_data) {
+        for (var key in event_data.user_data) {
           if (event_data.user_data.hasOwnProperty(key)) {
             firestore_data[key] = event_data.user_data[key];
           }
         }
 
         // Add session parameters to Firestore
-        for (let key in event_data.session_data) {
+        for (var key in event_data.session_data) {
           if (event_data.session_data.hasOwnProperty(key)) {
             firestore_data.sessions[0][key] = event_data.session_data[key];
           }
@@ -2531,10 +2547,10 @@ function send_to_firestore(event_data) {
         return Firestore.write(document_path, firestore_data, { projectId: projectId, merge: true })
           .then(
             (id) => {
-              if (data.enable_logs) { log('🟢 User successfully created in Firestore, session successfully added into Firestore'); }
+              if (data.enable_logs) { log('🟢 User successfully created in Firestore, session successfully added to Firestore'); }
 
               // Add user parameters to Big Query        
-              for (let key in firestore_data) {
+              for (var key in firestore_data) {
                 if (firestore_data.hasOwnProperty(key) && key !== 'sessions') {
                   event_data.user_data[key] = firestore_data[key];
                 }
@@ -2555,7 +2571,7 @@ function send_to_firestore(event_data) {
               return { status: true, status_code: 200, message: '🟢 Request claimed successfully' };
             },
             () => {
-              message = '🔴 User or session data not created in Firestore';
+              message = '🔴 User or session data not created to Firestore';
               status_code = 403;
 
               if (data.enable_logs) { log(message); }
@@ -2603,12 +2619,12 @@ function send_to_firestore(event_data) {
         });
 
         // Update last session timestamp of the user
-        if (event_data.session_id != last_session.session_id) {
+        if (event_data.session_id !== last_session.session_id) {
           firestore_data.user_last_session_timestamp = event_data.event_timestamp;
         }
 
         // Add user parameters to Big Query        
-        for (let key in firestore_data) {
+        for (var key in firestore_data) {
           if (firestore_data.hasOwnProperty(key) && key !== 'sessions') {
             event_data.user_data[key] = firestore_data[key];
           }
@@ -2620,7 +2636,7 @@ function send_to_firestore(event_data) {
         Object.delete(event_data.user_data, 'client_id');
 
         // If session doesn't exists in Firestore
-        if (event_data.session_id != last_session.session_id) {
+        if (event_data.session_id !== last_session.session_id) {
           if (data.enable_logs) { log('👉 Session does not exist'); }
 
           // Set new session values for Firestore from current event data
@@ -2649,15 +2665,13 @@ function send_to_firestore(event_data) {
             session_exit_page_category: (event_data.page_data.page_category) ? event_data.page_data.page_category : null,
             session_exit_page_location: event_data.page_data.page_location,
             session_exit_page_title: event_data.page_data.page_title,
-            session_start_timestamp: (event_data.event_name == 'page_view') ? event_data.event_timestamp : null,
+            session_start_timestamp: (event_data.event_name === 'page_view') ? event_data.event_timestamp : null,
             session_end_timestamp: event_data.event_timestamp,
-            user_id: event_data.session_data.user_id || null,
-            total_events: 1,
-            total_page_views: 1
+            user_id: event_data.session_data.user_id || null
           };
 
           // Add session parameters for Firestore
-          for (let key in event_data.session_data) {
+          for (var key in event_data.session_data) {
             if (event_data.session_data.hasOwnProperty(key)) {
               new_session[key] = event_data.session_data[key];
             }
@@ -2672,7 +2686,7 @@ function send_to_firestore(event_data) {
           return Firestore.write(document_path, firestore_data, { projectId: projectId, merge: true })
             .then(
               (id) => {
-                if (data.enable_logs) { log('🟢 User already in Firestore, session successfully added into Firestore'); }
+                if (data.enable_logs) { log('🟢 User already in Firestore, session successfully added to Firestore'); }
 
                 // Add data to BigQuery
                 event_data.session_data = firestore_data.sessions.slice(-1)[0];
@@ -2684,7 +2698,7 @@ function send_to_firestore(event_data) {
                 return { status: true, status_code: 200, message: '🟢 Request claimed successfully' };
               },
               () => {
-                message = '🔴 User or session data not added in Firestore';
+                message = '🔴 User or session data not added to Firestore';
                 status_code = 403;
 
                 if (data.enable_logs) { log(message); }
@@ -2724,9 +2738,7 @@ function send_to_firestore(event_data) {
             "session_exit_page_title",
             "session_start_timestamp",
             "session_end_timestamp",
-            "user_id",
-            "total_events",
-            "total_page_views"
+            "user_id"
           ];
 
           Object.keys(event_data.session_data).forEach(function (key) {
@@ -2745,14 +2757,12 @@ function send_to_firestore(event_data) {
           last_session.session_exit_page_location = event_data.page_data.page_location;
           last_session.session_exit_page_title = event_data.page_data.page_title;
           last_session.session_end_timestamp = event_data.event_timestamp;
-          if (last_session.cross_domain_session == 'No') {
+          if (last_session.cross_domain_session === 'No') {
             last_session.cross_domain_session = (event_data.event_data.cross_domain_id) ? 'Yes' : 'No';
           }
 
-          if (event_data.event_name == 'login') { last_session.user_id = event_data.session_data.user_id; }
-          if (event_data.event_name == 'logout') { last_session.user_id = null; }
-          last_session.total_events = last_session.total_events + 1;
-          if (event_data.event_name == 'page_view') { last_session.total_page_views = last_session.total_page_views + 1; }
+          if (event_data.event_name === 'login') { last_session.user_id = event_data.session_data.user_id; }
+          if (event_data.event_name === 'logout') { last_session.user_id = null; }
 
           // Send data to firestore                    
           if (data.enable_logs) { log('👉 Payload to send: ', firestore_data); }
@@ -2760,7 +2770,7 @@ function send_to_firestore(event_data) {
           return Firestore.write(document_path, firestore_data, { projectId: projectId, merge: true })
             .then(
               (id) => {
-                if (data.enable_logs) { log('🟢 User already in Firestore, session successfully updated into Firestore'); }
+                if (data.enable_logs) { log('🟢 User already in Firestore, session successfully updated to Firestore'); }
 
                 // Add data for BigQuery
                 event_data.session_data = last_session;
@@ -2772,7 +2782,7 @@ function send_to_firestore(event_data) {
                 return { status: true, status_code: 200, message: '🟢 Request claimed successfully' };
               },
               () => {
-                message = '🔴 User or session data not updated in Firestore';
+                message = '🔴 User or session data not updated to Firestore';
                 status_code = 403;
 
                 if (data.enable_logs) { log(message); }
@@ -2856,12 +2866,12 @@ function encode_data(bq_event_data, prop) {
     Object.keys(bq_event_data[prop]).forEach((key) => {
       var temp_data = {};
       // Is string 
-      if (getType(bq_event_data[prop][key]) == 'string') {
+      if (getType(bq_event_data[prop][key]) === 'string') {
         temp_data.name = key;
         temp_data.value = { string: bq_event_data[prop][key] || null };
         // Is number (integer or float)    
-      } else if (getType(bq_event_data[prop][key]) == 'number') {
-        if (bq_event_data[prop][key] % 1 != 0) {
+      } else if (getType(bq_event_data[prop][key]) === 'number') {
+        if (bq_event_data[prop][key] % 1 !== 0) {
           temp_data.name = key;
           temp_data.value = { float: bq_event_data[prop][key] };
         } else {
@@ -2869,16 +2879,16 @@ function encode_data(bq_event_data, prop) {
           temp_data.value = { int: bq_event_data[prop][key] };
         }
         // Is JSON (object or array) 
-      } else if (getType(bq_event_data[prop][key]) == 'object' || getType(bq_event_data[prop][key]) == 'array') {
+      } else if (getType(bq_event_data[prop][key]) === 'object' || getType(bq_event_data[prop][key]) === 'array') {
         temp_data.name = key;
         temp_data.value = { json: JSON.stringify(bq_event_data[prop][key]) };
 
         // Is null or undefined
-      } else if (getType(bq_event_data[prop][key]) == 'null' || getType(bq_event_data[prop][key]) == 'undefined') {
+      } else if (getType(bq_event_data[prop][key]) === 'null' || getType(bq_event_data[prop][key]) === 'undefined') {
         temp_data.name = key;
         temp_data.value = null;
         // Is boolean        
-      } else if (getType(bq_event_data[prop][key]) == 'boolean') {
+      } else if (getType(bq_event_data[prop][key]) === 'boolean') {
         temp_data.name = key;
         temp_data.value = { bool: bq_event_data[prop][key] };
       }
@@ -2905,7 +2915,7 @@ function send_to_custom_endpoint(custom_request_endpoint_path, event_data) {
     const custom_request_headers = data.custom_request_headers;
 
     if (custom_request_headers !== undefined) {
-      for (let i = 0; i < custom_request_headers.length; i++) {
+      for (var i = 0; i < custom_request_headers.length; i++) {
         const header_name = custom_request_headers[i].header_name;
         const header_value = custom_request_headers[i].header_value;
 
