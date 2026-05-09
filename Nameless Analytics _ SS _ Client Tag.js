@@ -53,6 +53,9 @@ const event_date = event_data.event_date;
 const event_timestamp = event_data.event_timestamp;
 const event_name = event_data.event_name;
 const event_id = event_data.event_id;
+event_data.user_data = event_data.user_data || {};
+event_data.session_data = event_data.session_data || {};
+event_data.gtm_data = event_data.gtm_data || {};
 const event_data_obj = event_data.event_data || {};
 if (event_data.event_data) {
   event_data.event_data.channel_grouping = get_channel_grouping(event_data_obj.source, event_data_obj.campaign);
