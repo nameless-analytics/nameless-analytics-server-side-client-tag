@@ -358,11 +358,11 @@ function check_ip() {
 // CHANNEL GROUPING
 function get_channel_grouping(source, campaign) {
   const patterns = {
-    ai: createRegex('chatgpt|gemini|bard|claude|alexa|siri|assistant|\\.ai([/]|$)', 'i'),
     search_engine: createRegex('360\\.cn|alice|aol|ar\\.search\\.yahoo\\.com|ask|bing|google|yahoo|yandex|baidu|ecosia|duckduckgo|sogou|naver|seznam', 'i'),
     social: createRegex('facebook|twitter|instagram|pinterest|linkedin|reddit|vk\\.com|tiktok|snapchat|tumblr|wechat|whatsapp', 'i'),
     shopping: createRegex('amazon|ebay|etsy|shopify|stripe|walmart|mercadolibre|alibaba|naver\\.shopping', 'i'),
     video: createRegex('youtube|vimeo|netflix|twitch|dailymotion|hulu|disneyplus|wistia|youku', 'i'),
+    ai: createRegex('chatgpt|gemini|bard|claude|alexa|siri|assistant|\\.ai([/]|$)', 'i'),
     email: createRegex('email|e-mail|newsletter|mailchimp|sendgrid|sparkpost', 'i')
   };
 
@@ -370,11 +370,11 @@ function get_channel_grouping(source, campaign) {
   // if (source === 'direct') return 'direct';
   if (!source || source === 'direct') return 'direct';
   if (source === 'tagassistant.google.com') return 'gtm_debugger';
+  if (testRegex(patterns.ai, source)) return 'ai';
   if (testRegex(patterns.search_engine, source)) return campaign ? 'paid_search_engine' : 'organic_search_engine';
   if (testRegex(patterns.social, source)) return campaign ? 'paid_social' : 'organic_social';
   if (testRegex(patterns.shopping, source)) return campaign ? 'paid_shopping' : 'organic_shopping';
   if (testRegex(patterns.video, source)) return campaign ? 'paid_video' : 'organic_video';
-  if (testRegex(patterns.ai, source)) return 'ai';
   if (testRegex(patterns.email, source)) return 'email';
 
   if (!campaign) return 'referral';
