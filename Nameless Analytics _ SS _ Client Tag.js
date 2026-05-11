@@ -358,11 +358,11 @@ function check_ip() {
 // CHANNEL GROUPING
 function get_channel_grouping(source, campaign) {
   const patterns = {
+    ai: createRegex('chatgpt|gemini|bard|claude|alexa|siri|assistant|\\.ai([/]|$)', 'i'),
     search_engine: createRegex('360\\.cn|alice|aol|ar\\.search\\.yahoo\\.com|ask|bing|google|yahoo|yandex|baidu|ecosia|duckduckgo|sogou|naver|seznam', 'i'),
     social: createRegex('facebook|twitter|instagram|pinterest|linkedin|reddit|vk\\.com|tiktok|snapchat|tumblr|wechat|whatsapp', 'i'),
     shopping: createRegex('amazon|ebay|etsy|shopify|stripe|walmart|mercadolibre|alibaba|naver\\.shopping', 'i'),
     video: createRegex('youtube|vimeo|netflix|twitch|dailymotion|hulu|disneyplus|wistia|youku', 'i'),
-    ai: createRegex('chatgpt|gemini|bard|claude|alexa|siri|assistant|\\.ai([/]|$)', 'i'),
     email: createRegex('email|e-mail|newsletter|mailchimp|sendgrid|sparkpost', 'i')
   };
 
