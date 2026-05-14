@@ -857,7 +857,7 @@ function send_to_firestore(event_data) {
 
         const firestore_data = documents[0].data;
         const sessions_data = firestore_data.sessions;
-        const last_session = sessions_data.filter(s => s.session_id === event_data.session_id)[0] || sessions_data.slice(-1)[0];
+        const last_session = sessions_data.filter(s => s.session_id === event_data.session_id)[0];
 
         // Update user values in Firestore from current user data if not already exists or has a not null value        
         const protected_keys = [
@@ -889,11 +889,6 @@ function send_to_firestore(event_data) {
           }
         });
 
-        // Update last session timestamp of the user
-        if (event_data.session_id !== last_session.session_id) {
-          firestore_data.user_last_session_timestamp = event_data.event_timestamp;
-        }
-
         // Add user parameters to Big Query        
         for (var key in firestore_data) {
           if (firestore_data.hasOwnProperty(key) && key !== 'sessions') {
@@ -909,6 +904,9 @@ function send_to_firestore(event_data) {
         // If session doesn't exists in Firestore
         if (event_data.session_id !== last_session.session_id) {
           if (data.enable_logs) { log('👉 Session does not exist'); }
+
+          // Update last session timestamp of the user
+          firestore_data.user_last_session_timestamp = event_data.event_timestamp;
 
           // Set new session values for Firestore from current event data
           var new_session = {
