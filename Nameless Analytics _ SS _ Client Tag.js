@@ -857,8 +857,7 @@ function send_to_firestore(event_data) {
 
         const firestore_data = documents[0].data;
         const sessions_data = firestore_data.sessions;
-        const last_session = sessions_data.slice(-1)[0];
-        // const last_session = sessions_data.filter(s => s.session_id === event_data.session_id)[0] || null;
+        const last_session = sessions_data.filter(s => s.session_id === event_data.session_id)[0] || sessions_data.slice(-1)[0];
 
         // Update user values in Firestore from current user data if not already exists or has a not null value        
         const protected_keys = [
