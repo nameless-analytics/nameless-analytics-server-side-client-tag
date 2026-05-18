@@ -127,8 +127,6 @@ These session parameters are reserved and can't be modified:
 - session_exit_page_title 
 - session_start_timestamp 
 - session_end_timestamp
-- total_events
-- total_page_views
 
 #### Add/override User ID parameter
 Add or override User ID parameter at session level. Accepted values: strings, integers, floats, JSON and booleans.
