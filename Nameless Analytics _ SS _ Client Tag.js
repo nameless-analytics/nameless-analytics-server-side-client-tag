@@ -858,6 +858,7 @@ function send_to_firestore(event_data) {
         const firestore_data = documents[0].data;
         const sessions_data = firestore_data.sessions;
         const last_session = sessions_data.filter(s => s.session_id === event_data.session_id)[0];
+        const actual_last_session = sessions_data.length > 0 ? sessions_data[sessions_data.length - 1] : null;
 
         // Update user values in Firestore from current user data if not already exists or has a not null value        
         const protected_keys = [
@@ -902,7 +903,7 @@ function send_to_firestore(event_data) {
         Object.delete(event_data.user_data, 'client_id');
 
         // If session doesn't exists in Firestore
-        if (event_data.session_id !== last_session.session_id) {
+        if (!last_session) {
           if (data.enable_logs) { log('👉 Session does not exist'); }
 
           // Update last session timestamp of the user
@@ -912,7 +913,7 @@ function send_to_firestore(event_data) {
           var new_session = {
             session_date: event_data.event_date,
             session_id: event_data.session_id,
-            session_number: last_session.session_number + 1,
+            session_number: actual_last_session ? actual_last_session.session_number + 1 : 1,
             cross_domain_session: (event_data.event_data.cross_domain_id) ? 'Yes' : 'No',
             session_channel_grouping: event_data.event_data.channel_grouping,
             session_source: event_data.event_data.source,

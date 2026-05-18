@@ -587,20 +587,6 @@ ___TEMPLATE_PARAMETERS___
                       "^(?!user_id$).*"
                     ],
                     "errorMessage": "Can\u0027t add/override user_id parameter."
-                  },
-                  {
-                    "type": "REGEX",
-                    "args": [
-                      "^(?!total_events$).*"
-                    ],
-                    "errorMessage": "Can\u0027t add/override total_events parameter."
-                  },
-                  {
-                    "type": "REGEX",
-                    "args": [
-                      "^(?!total_page_views$).*"
-                    ],
-                    "errorMessage": "Can\u0027t add/override total_page_views parameter."
                   }
                 ]
               },
@@ -629,7 +615,7 @@ ___TEMPLATE_PARAMETERS___
           }
         ],
         "alwaysInSummary": true,
-        "help": "Add or override session parameters to the request in session_data. If a parameter has the same name, it will be overridden.\n\u003c/br\u003e\u003c/br\u003e\nReserved session parameters: \u003c/br\u003e\n• user_id \u003c/br\u003e\n• session_number \u003c/br\u003e \n• cross_domain_session \u003c/br\u003e \n• session_channel_grouping \u003c/br\u003e \n• session_source \u003c/br\u003e \n• session_tld_source \u003c/br\u003e \n• session_campaign \u003c/br\u003e \n• session_campaign_id \u003c/br\u003e \n• session_campaign_click_id \u003c/br\u003e\n• session_campaign_content \u003c/br\u003e \n• session_campaign_term \u003c/br\u003e \n• session_device_type \u003c/br\u003e \n• session_city \u003c/br\u003e\n• session_country \u003c/br\u003e \n• session_language \u003c/br\u003e \n• session_hostname \u003c/br\u003e \n• session_browser_name \u003c/br\u003e \n• session_landing_page_category \u003c/br\u003e \n• session_landing_page_location \u003c/br\u003e \n• session_landing_page_title \u003c/br\u003e \n• session_exit_page_category \u003c/br\u003e \n• session_exit_page_location \u003c/br\u003e \n• session_exit_page_title \u003c/br\u003e \n• session_start_timestamp \u003c/br\u003e \n• session_end_timestamp \u003c/br\u003e\n• total_events \u003c/br\u003e\n• total_page_views",
+        "help": "Add or override session parameters to the request in session_data. If a parameter has the same name, it will be overridden.\n\u003c/br\u003e\u003c/br\u003e\nReserved session parameters: \u003c/br\u003e\n• user_id \u003c/br\u003e\n• session_number \u003c/br\u003e \n• cross_domain_session \u003c/br\u003e \n• session_channel_grouping \u003c/br\u003e \n• session_source \u003c/br\u003e \n• session_tld_source \u003c/br\u003e \n• session_campaign \u003c/br\u003e \n• session_campaign_id \u003c/br\u003e \n• session_campaign_click_id \u003c/br\u003e\n• session_campaign_content \u003c/br\u003e \n• session_campaign_term \u003c/br\u003e \n• session_device_type \u003c/br\u003e \n• session_city \u003c/br\u003e\n• session_country \u003c/br\u003e \n• session_language \u003c/br\u003e \n• session_hostname \u003c/br\u003e \n• session_browser_name \u003c/br\u003e \n• session_landing_page_category \u003c/br\u003e \n• session_landing_page_location \u003c/br\u003e \n• session_landing_page_title \u003c/br\u003e \n• session_exit_page_category \u003c/br\u003e \n• session_exit_page_location \u003c/br\u003e \n• session_exit_page_title \u003c/br\u003e \n• session_start_timestamp \u003c/br\u003e \n• session_end_timestamp",
         "defaultValue": false,
         "displayName": ""
       },
@@ -829,20 +815,6 @@ ___TEMPLATE_PARAMETERS___
                       "^(?!user_id$).*"
                     ],
                     "errorMessage": "Can\u0027t remove user_id parameter."
-                  },
-                  {
-                    "type": "REGEX",
-                    "args": [
-                      "^(?!total_events$).*"
-                    ],
-                    "errorMessage": "Can\u0027t remove total_events parameter."
-                  },
-                  {
-                    "type": "REGEX",
-                    "args": [
-                      "^(?!total_page_views$).*"
-                    ],
-                    "errorMessage": "Can\u0027t remove total_page_views parameter."
                   }
                 ]
               }
@@ -863,7 +835,7 @@ ___TEMPLATE_PARAMETERS___
           }
         ],
         "alwaysInSummary": true,
-        "help": "Remove session parameters from the request in session_data. If a parameter has the same name, it will be overridden.\n\u003c/br\u003e\u003c/br\u003e\nReserved session parameters: \u003c/br\u003e\n• user_id \u003c/br\u003e\n• session_number \u003c/br\u003e \n• cross_domain_session \u003c/br\u003e \n• session_channel_grouping \u003c/br\u003e \n• session_source \u003c/br\u003e \n• session_tld_source \u003c/br\u003e \n• session_campaign \u003c/br\u003e \n• session_campaign_id \u003c/br\u003e \n• session_campaign_click_id \u003c/br\u003e\n• session_campaign_content \u003c/br\u003e \n• session_campaign_term \u003c/br\u003e \n• session_device_type \u003c/br\u003e \n• session_city \u003c/br\u003e\n• session_country \u003c/br\u003e \n• session_language \u003c/br\u003e \n• session_hostname \u003c/br\u003e \n• session_browser_name \u003c/br\u003e \n• session_landing_page_category \u003c/br\u003e \n• session_landing_page_location \u003c/br\u003e \n• session_landing_page_title \u003c/br\u003e \n• session_exit_page_category \u003c/br\u003e \n• session_exit_page_location \u003c/br\u003e \n• session_exit_page_title \u003c/br\u003e \n• session_start_timestamp \u003c/br\u003e \n• session_end_timestamp \u003c/br\u003e\n• total_events \u003c/br\u003e\n• total_page_views",
+        "help": "Remove session parameters from the request in session_data. If a parameter has the same name, it will be overridden.\n\u003c/br\u003e\u003c/br\u003e\nReserved session parameters: \u003c/br\u003e\n• user_id \u003c/br\u003e\n• session_number \u003c/br\u003e \n• cross_domain_session \u003c/br\u003e \n• session_channel_grouping \u003c/br\u003e \n• session_source \u003c/br\u003e \n• session_tld_source \u003c/br\u003e \n• session_campaign \u003c/br\u003e \n• session_campaign_id \u003c/br\u003e \n• session_campaign_click_id \u003c/br\u003e\n• session_campaign_content \u003c/br\u003e \n• session_campaign_term \u003c/br\u003e \n• session_device_type \u003c/br\u003e \n• session_city \u003c/br\u003e\n• session_country \u003c/br\u003e \n• session_language \u003c/br\u003e \n• session_hostname \u003c/br\u003e \n• session_browser_name \u003c/br\u003e \n• session_landing_page_category \u003c/br\u003e \n• session_landing_page_location \u003c/br\u003e \n• session_landing_page_title \u003c/br\u003e \n• session_exit_page_category \u003c/br\u003e \n• session_exit_page_location \u003c/br\u003e \n• session_exit_page_title \u003c/br\u003e \n• session_start_timestamp \u003c/br\u003e \n• session_end_timestamp",
         "defaultValue": false,
         "displayName": ""
       }
@@ -1784,6 +1756,9 @@ const event_date = event_data.event_date;
 const event_timestamp = event_data.event_timestamp;
 const event_name = event_data.event_name;
 const event_id = event_data.event_id;
+event_data.user_data = event_data.user_data || {};
+event_data.session_data = event_data.session_data || {};
+event_data.gtm_data = event_data.gtm_data || {};
 const event_data_obj = event_data.event_data || {};
 if (event_data.event_data) {
   event_data.event_data.channel_grouping = get_channel_grouping(event_data_obj.source, event_data_obj.campaign);
@@ -2098,11 +2073,11 @@ function get_channel_grouping(source, campaign) {
   // if (source === 'direct') return 'direct';
   if (!source || source === 'direct') return 'direct';
   if (source === 'tagassistant.google.com') return 'gtm_debugger';
+  if (testRegex(patterns.ai, source)) return 'ai';
   if (testRegex(patterns.search_engine, source)) return campaign ? 'paid_search_engine' : 'organic_search_engine';
   if (testRegex(patterns.social, source)) return campaign ? 'paid_social' : 'organic_social';
   if (testRegex(patterns.shopping, source)) return campaign ? 'paid_shopping' : 'organic_shopping';
   if (testRegex(patterns.video, source)) return campaign ? 'paid_video' : 'organic_video';
-  if (testRegex(patterns.ai, source)) return 'ai';
   if (testRegex(patterns.email, source)) return 'email';
 
   if (!campaign) return 'referral';
@@ -2585,8 +2560,8 @@ function send_to_firestore(event_data) {
 
         const firestore_data = documents[0].data;
         const sessions_data = firestore_data.sessions;
-        const last_session = sessions_data.slice(-1)[0];
-        // const last_session = sessions_data.filter(s => s.session_id === event_data.session_id)[0] || null;
+        const last_session = sessions_data.filter(s => s.session_id === event_data.session_id)[0];
+        const actual_last_session = sessions_data.length > 0 ? sessions_data[sessions_data.length - 1] : null;
 
         // Update user values in Firestore from current user data if not already exists or has a not null value        
         const protected_keys = [
@@ -2618,11 +2593,6 @@ function send_to_firestore(event_data) {
           }
         });
 
-        // Update last session timestamp of the user
-        if (event_data.session_id !== last_session.session_id) {
-          firestore_data.user_last_session_timestamp = event_data.event_timestamp;
-        }
-
         // Add user parameters to Big Query        
         for (var key in firestore_data) {
           if (firestore_data.hasOwnProperty(key) && key !== 'sessions') {
@@ -2636,14 +2606,17 @@ function send_to_firestore(event_data) {
         Object.delete(event_data.user_data, 'client_id');
 
         // If session doesn't exists in Firestore
-        if (event_data.session_id !== last_session.session_id) {
+        if (!last_session) {
           if (data.enable_logs) { log('👉 Session does not exist'); }
+
+          // Update last session timestamp of the user
+          firestore_data.user_last_session_timestamp = event_data.event_timestamp;
 
           // Set new session values for Firestore from current event data
           var new_session = {
             session_date: event_data.event_date,
             session_id: event_data.session_id,
-            session_number: last_session.session_number + 1,
+            session_number: actual_last_session ? actual_last_session.session_number + 1 : 1,
             cross_domain_session: (event_data.event_data.cross_domain_id) ? 'Yes' : 'No',
             session_channel_grouping: event_data.event_data.channel_grouping,
             session_source: event_data.event_data.source,
