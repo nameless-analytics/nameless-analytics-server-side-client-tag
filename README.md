@@ -9,7 +9,7 @@ For an overview of how Nameless Analytics works [start from here](https://github
 
 
 ## Table of Contents
-- [Nameless Analytics Server-side Client Tag UI](#server-side-client-tag-ui)
+- [Nameless Analytics Server-side Client Tag UI](#nameless-analytics-server-side-client-tag-ui)
 - [User data](#user-data)
   - [User parameters](#user-parameters)
     - [Add/override user level parameters](#addoverride-user-level-parameters)
@@ -29,7 +29,6 @@ For an overview of how Nameless Analytics works [start from here](https://github
   - [Reject requests by IP](#reject-requests-by-ip)
   - [Enable Bot protection](#enable-bot-protection)
   - [API key for Streaming protocol requests](#api-key-for-streaming-protocol-requests)
-    - [Streaming protocol request example](#streaming-protocol-request-example)
 - [Google BigQuery settings](#google-bigquery-settings)
   - [Project name](#project-name)
   - [Dataset name](#dataset-name)
