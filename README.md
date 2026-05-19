@@ -2,7 +2,7 @@
 
 The Nameless Analytics Server-side Client Tag is a highly customizable GTM custom template designed to claim and enhance requests from [Nameless Analytics Client-side Tracker Tag](https://github.com/nameless-analytics/client-side-tracker-tag/) and other sources.
 
-For an overview of how Nameless Analytics works [start from here](https://github.com/nameless-analytics/nameless-analytics/#high-level-data-flow).
+For an overview of how Nameless Analytics works [start from here](https://github.com/nameless-analytics/nameless-analytics/#overview).
 
 ### 🚧 Nameless Analytics and the documentation are currently in beta and subject to change
 
@@ -57,7 +57,7 @@ This is the UI of the Nameless Analytics Server-side Client Tag.
 
 ## User data
 ### User parameters
-Add, override or remove user parameters in the user_data object. See [Parameter Hierarchy & Overriding](https://github.com/nameless-analytics/nameless-analytics/#parameter-hierarchy--overriding) in the main project documentation.
+Add, override or remove user parameters in the user_data object. See [Parameter Hierarchy](https://github.com/nameless-analytics/nameless-analytics/#parameter-hierarchy) in the main project documentation.
 
 They will be:
 - written in Google Cloud Firestore every time they change --> latest values 
@@ -95,7 +95,7 @@ These parameters can remove:
 
 ## Session data
 ### Session parameters
-Add, override or remove session parameters in the session_data object. See [Parameter Hierarchy & Overriding](https://github.com/nameless-analytics/nameless-analytics/#parameter-hierarchy--overriding) in the main project documentation.
+Add, override or remove session parameters in the session_data object. See [Parameter Hierarchy](https://github.com/nameless-analytics/nameless-analytics/#parameter-hierarchy) in the main project documentation.
 
 They will be:
 - written in Google Cloud Firestore every time they change --> latest values 
@@ -150,7 +150,7 @@ These parameters can remove:
 
 ## Event data
 ### Event parameters
-Add, override or remove event parameters in the event_data object. See [Parameter Hierarchy & Overriding](https://github.com/nameless-analytics/nameless-analytics/#parameter-hierarchy--overriding) in the main project documentation.
+Add, override or remove event parameters in the event_data object. See [Parameter Hierarchy](https://github.com/nameless-analytics/nameless-analytics/#parameter-hierarchy) in the main project documentation.
 
 They will be sent to BigQuery with every event.
 
