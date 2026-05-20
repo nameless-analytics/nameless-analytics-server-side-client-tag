@@ -42,7 +42,7 @@ var status_code;
 
 // Event data
 const event_data = JSON.parse(getRequestBody());
-const event_api_key = getRequestHeader('x-api-key'); // For Streaming protocol 
+const event_api_key = getRequestHeader('X-Api-Key'); // For Streaming protocol 
 const api_key = data.api_key; // For Streaming protocol
 
 const page_date = event_data.page_date;
@@ -164,7 +164,7 @@ if (getRequestPath() === endpoint) {
 
         // Check User-Agent header (Bot detection)
         const request_user_agent = getRequestHeader('User-Agent') || '';
-        
+
         if (request_user_agent === '' || request_user_agent === null) {
           message = '🔴 Missing User-Agent header. Request from bot';
           status_code = 403;
@@ -185,13 +185,13 @@ if (getRequestPath() === endpoint) {
 
         if (data.enable_bot_protection) {
           const bad_agents = ["curl", "wget", "python", "requests", "httpie", "go-http-client", "java", "okhttp", "libwww", "perl", "axios", "node", "fetch", "php", "guzzle", "ruby", "faraday", "rest-client", "gptbot", "chatgpt", "anthropic", "claude", "perplexity", "bytspider", "ccbot", "ahrefs", "semrush", "dotbot", "mj12", "rogerbot", "nmap", "zgrab", "masscan", "shodan", "bot", "crawler", "spider", "scraper", "headless", "phantomjs", "selenium", "puppeteer", "playwright", "cypress", "electron"];
-                
+
           for (var i = 0; i < bad_agents.length; i++) {
             if (request_user_agent.indexOf(bad_agents[i]) !== -1) {
               message = '🔴 Invalid User-Agent header value. Request from bot';
               status_code = 403;
               if (data.enable_logs) { log(message); }
-  
+
               claim_request({ event_name: event_name }, status_code, message);
               return;
             }
@@ -325,9 +325,9 @@ function check_origin() {
 
   if (data.enable_logs) { log('👉 Endpoint:', endpoint); }
   if (data.enable_logs) { log('👉 Authorized origins:', (data.add_authorized_domains) ? authorized_domains.slice(2) : ' All'); }
-  
-  if (data.enable_logs && data.enable_bot_protection) {log('👉 Bot detection enabled'); }
-  
+
+  if (data.enable_logs && data.enable_bot_protection) { log('👉 Bot detection enabled'); }
+
   for (var i = 0; i < authorized_domains_list.length; i++) {
     if (computeEffectiveTldPlusOne(request_origin) === computeEffectiveTldPlusOne(authorized_domains_list[i].authorized_domain)) {
       return true;
