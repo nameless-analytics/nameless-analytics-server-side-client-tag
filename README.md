@@ -223,7 +223,7 @@ Requests with a missing or empty `User-Agent` header are also automatically reje
 ### API key for Streaming protocol requests
 Secure the Streaming protocol (Measurement Protocol) endpoint by requiring a secret API key.
 
-When the **"Add API key for Streaming protocol"** checkbox is enabled, the Client Tag will reject any request where the `event_origin` is set to `Streaming protocol` unless it includes a valid `x-api-key` header matching the configured value.
+When the **"Add API key for Streaming protocol"** checkbox is enabled, the Client Tag will reject any request where the `event_origin` is set to `Streaming protocol` unless it includes a valid `X-Api-Key` header matching the configured value.
 
 Requests with `event_origin` set to `Website` are not affected by this setting, ensuring seamless browser tracking without the need for additional headers or CORS preflight requests.
 
