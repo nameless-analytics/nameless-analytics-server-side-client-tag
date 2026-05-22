@@ -199,8 +199,13 @@ if (getRequestPath() === endpoint) {
         }
 
         // Check Streaming protocol requests API key
-        if (event_origin === 'Streaming protocol' && data.add_api_key && event_api_key !== api_key) {
-          message = '🔴 Invalid API key';
+        if (event_origin === 'Streaming protocol' && event_api_key !== api_key) {
+          if (data.add_api_key) {
+            message = '🔴 Invalid API key';
+          } else {
+            message = '🔴 Add API key for Streaming protocol is not enabled.';
+          }
+
           if (data.enable_logs) { log(message); }
           status_code = 403;
 
