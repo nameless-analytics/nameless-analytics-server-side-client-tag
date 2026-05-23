@@ -163,7 +163,7 @@ if (getRequestPath() === endpoint) {
         }
 
         // Check User-Agent header (Bot detection)
-        const request_user_agent = getRequestHeader('User-Agent') || '';
+        const request_user_agent = (getRequestHeader('User-Agent') || '').toLowerCase();
 
         if (request_user_agent === '' || request_user_agent === null) {
           message = '🔴 Missing User-Agent header. Request from bot';
