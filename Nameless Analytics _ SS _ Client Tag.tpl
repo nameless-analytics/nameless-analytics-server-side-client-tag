@@ -1858,7 +1858,7 @@ if (getRequestPath() === endpoint) {
         }
 
         // Check User-Agent header (Bot detection)
-        const request_user_agent = getRequestHeader('User-Agent') || '';
+        const request_user_agent = (getRequestHeader('User-Agent') || '').toLowerCase();
 
         if (request_user_agent === '' || request_user_agent === null) {
           message = '🔴 Missing User-Agent header. Request from bot';
@@ -1869,7 +1869,7 @@ if (getRequestPath() === endpoint) {
           return;
         }
 
-        if (event_origin === 'Streaming protocol' && request_user_agent !== 'Nameless Analytics - Streaming protocol') {
+        if (event_origin === 'Streaming protocol' && request_user_agent !== 'nameless analytics - streaming protocol') {
           message = '🔴 Invalid User-Agent header value. Request from bot';
           if (data.enable_logs) { log(message); }
           status_code = 403;
@@ -2059,7 +2059,7 @@ function check_ip() {
 function get_channel_grouping(source, campaign) {
   const patterns = {
     search_engine: createRegex('360\\.cn|alice|aol|ar\\.search\\.yahoo\\.com|ask|bing|google|yahoo|yandex|baidu|ecosia|duckduckgo|sogou|naver|seznam', 'i'),
-    social: createRegex('facebook|twitter|instagram|pinterest|linkedin|reddit|vk\\.com|tiktok|snapchat|tumblr|wechat|whatsapp', 'i'),
+    social: createRegex('facebook|twitter|t\\.co|bsky\\.app|instagram|pinterest|linkedin|reddit|vk\\.com|tiktok|snapchat|tumblr|wechat|whatsapp', 'i'),
     shopping: createRegex('amazon|ebay|etsy|shopify|stripe|walmart|mercadolibre|alibaba|naver\\.shopping', 'i'),
     video: createRegex('youtube|vimeo|netflix|twitch|dailymotion|hulu|disneyplus|wistia|youku', 'i'),
     ai: createRegex('chatgpt|gemini|bard|claude|alexa|siri|assistant|\\.ai([/]|$)', 'i'),
