@@ -119,10 +119,10 @@ These session parameters are reserved and can't be modified:
 - session_hostname 
 - session_browser_name 
 - session_landing_page_category 
-- session_landing_page_location 
+- session_landing_page_path 
 - session_landing_page_title 
 - session_exit_page_category 
-- session_exit_page_location 
+- session_exit_page_path 
 - session_exit_page_title 
 - session_start_timestamp 
 - session_end_timestamp
