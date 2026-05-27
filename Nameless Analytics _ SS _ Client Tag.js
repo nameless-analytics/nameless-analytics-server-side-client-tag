@@ -1,3 +1,12 @@
+// --------------------------------------------------------------------------------------------------------------
+// NAMELESS ANALYTICS | SERVER SIDE | CLIENT TAG
+// This client tag template is used to receive and process requests from the Nameless Analytics Client-Side Tracker Tag.
+// --------------------------------------------------------------------------------------------------------------
+
+// --------------------------------------------------------------------------------------------------------------
+// LIBRARIES
+// --------------------------------------------------------------------------------------------------------------
+
 const log = require('logToConsole');
 const getTimestampMillis = require('getTimestampMillis');
 const claimRequest = require('claimRequest');
@@ -28,8 +37,9 @@ const createRegex = require('createRegex');
 const testRegex = require('testRegex');
 
 
-// ------------------------------------------------------------------------------------------------------------------------------------------------------
-
+// --------------------------------------------------------------------------------------------------------------
+// CONSTANTS
+// --------------------------------------------------------------------------------------------------------------
 
 // Request data
 const endpoint = data.endpoint;
@@ -83,6 +93,10 @@ function validate_session_cookie(cookie) {
   return testRegex(pattern, cookie);
 }
 
+
+// --------------------------------------------------------------------------------------------------------------
+// CHECK REQUESTS
+// --------------------------------------------------------------------------------------------------------------
 
 // Check request endpoint
 if (getRequestPath() === endpoint) {
@@ -360,35 +374,9 @@ function check_ip() {
 }
 
 
-// CHANNEL GROUPING
-function get_channel_grouping(source, campaign) {
-  const patterns = {
-    search_engine: createRegex('360\\.cn|alice|aol|ar\\.search\\.yahoo\\.com|ask|bing|google|yahoo|yandex|baidu|ecosia|duckduckgo|sogou|naver|seznam', 'i'),
-    social: createRegex('facebook|twitter|t\\.co|bsky\\.app|instagram|pinterest|linkedin|reddit|vk\\.com|tiktok|snapchat|tumblr|wechat|whatsapp', 'i'),
-    shopping: createRegex('amazon|ebay|etsy|shopify|stripe|walmart|mercadolibre|alibaba|naver\\.shopping', 'i'),
-    video: createRegex('youtube|vimeo|netflix|twitch|dailymotion|hulu|disneyplus|wistia|youku', 'i'),
-    ai: createRegex('chatgpt|gemini|bard|claude|alexa|siri|assistant|\\.ai([/]|$)', 'i'),
-    email: createRegex('email|e-mail|newsletter|mailchimp|sendgrid|sparkpost', 'i')
-  };
-
-  // if (!source) return 'internal_traffic';
-  // if (source === 'direct') return 'direct';
-  if (!source || source === 'direct') return 'direct';
-  if (source === 'tagassistant.google.com') return 'gtm_debugger';
-  if (testRegex(patterns.ai, source)) return 'ai';
-  if (testRegex(patterns.search_engine, source)) return campaign ? 'paid_search_engine' : 'organic_search_engine';
-  if (testRegex(patterns.social, source)) return campaign ? 'paid_social' : 'organic_social';
-  if (testRegex(patterns.shopping, source)) return campaign ? 'paid_shopping' : 'organic_shopping';
-  if (testRegex(patterns.video, source)) return campaign ? 'paid_video' : 'organic_video';
-  if (testRegex(patterns.email, source)) return 'email';
-
-  if (!campaign) return 'referral';
-  if (campaign) return 'affiliate';
-}
-
-
-// ------------------------------------------------------------------------------------------------------------------------------------------------------
-
+// --------------------------------------------------------------------------------------------------------------
+// HANDLE IDS
+// --------------------------------------------------------------------------------------------------------------
 
 // Handle ids for get_user_data requests (For cross-domain only)
 function set_ids_get_user_data() {
@@ -405,9 +393,6 @@ function set_ids_get_user_data() {
 
   return event_data;
 }
-
-
-// ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 // Handle ids for standard requests
@@ -528,8 +513,9 @@ function generate_alphanumeric() {
 }
 
 
-// ------------------------------------------------------------------------------------------------------------------------------------------------------
-
+// --------------------------------------------------------------------------------------------------------------
+// BUILD PAYLOAD
+// --------------------------------------------------------------------------------------------------------------
 
 // Build payload data for standard requests
 function build_payload(event_data) {
@@ -646,8 +632,39 @@ function build_payload(event_data) {
 }
 
 
-// ------------------------------------------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------
+// CHANNEL GROUPING
+// --------------------------------------------------------------------------------------------------------------
 
+function get_channel_grouping(source, campaign) {
+  const patterns = {
+    search_engine: createRegex('360\\.cn|alice|aol|ar\\.search\\.yahoo\\.com|ask|bing|google|yahoo|yandex|baidu|ecosia|duckduckgo|sogou|naver|seznam', 'i'),
+    social: createRegex('facebook|twitter|t\\.co|bsky\\.app|instagram|pinterest|linkedin|reddit|vk\\.com|tiktok|snapchat|tumblr|wechat|whatsapp', 'i'),
+    shopping: createRegex('amazon|ebay|etsy|shopify|stripe|walmart|mercadolibre|alibaba|naver\\.shopping', 'i'),
+    video: createRegex('youtube|vimeo|netflix|twitch|dailymotion|hulu|disneyplus|wistia|youku', 'i'),
+    ai: createRegex('chatgpt|gemini|bard|claude|alexa|siri|assistant|\\.ai([/]|$)', 'i'),
+    email: createRegex('email|e-mail|newsletter|mailchimp|sendgrid|sparkpost', 'i')
+  };
+
+  // if (!source) return 'internal_traffic';
+  // if (source === 'direct') return 'direct';
+  if (!source || source === 'direct') return 'direct';
+  if (source === 'tagassistant.google.com') return 'gtm_debugger';
+  if (testRegex(patterns.ai, source)) return 'ai';
+  if (testRegex(patterns.search_engine, source)) return campaign ? 'paid_search_engine' : 'organic_search_engine';
+  if (testRegex(patterns.social, source)) return campaign ? 'paid_social' : 'organic_social';
+  if (testRegex(patterns.shopping, source)) return campaign ? 'paid_shopping' : 'organic_shopping';
+  if (testRegex(patterns.video, source)) return campaign ? 'paid_video' : 'organic_video';
+  if (testRegex(patterns.email, source)) return 'email';
+
+  if (!campaign) return 'referral';
+  if (campaign) return 'affiliate';
+}
+
+
+// --------------------------------------------------------------------------------------------------------------
+// CLAIM REQUESTS
+// --------------------------------------------------------------------------------------------------------------
 
 // Claim requests
 function claim_request(event_data, status_code, message) {
@@ -715,10 +732,10 @@ function return_response(event_data, status_code, message) {
 }
 
 
-// ------------------------------------------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------
+// SEND DATA TO GOOGLE FIRESTORE
+// --------------------------------------------------------------------------------------------------------------
 
-
-// Send data to Google Firestore
 function send_to_firestore(event_data) {
   const projectId = data.bq_project_id;
   const queries = [['client_id', '==', event_data.client_id]];
@@ -1093,10 +1110,10 @@ function set_cookie(cookie_name, cookie_value, max_age) {
 }
 
 
-// ------------------------------------------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------
+// SEND DATA TO GOOGLE BIGQUERY
+// --------------------------------------------------------------------------------------------------------------
 
-
-// Send data to Google BigQuery
 function send_to_bq(event_data) {
   const payload_copy = JSON.parse(JSON.stringify(event_data));
 
@@ -1174,10 +1191,10 @@ function encode_data(bq_event_data, prop) {
 }
 
 
-// ------------------------------------------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------
+// SEND DATA TO CUSTOM ENDPOINT
+// --------------------------------------------------------------------------------------------------------------
 
-
-// Send data to custom endpoint 
 function send_to_custom_endpoint(custom_request_endpoint_path, event_data) {
   if (data.enable_logs) { log('👉 Payload to send: ', event_data); }
 
