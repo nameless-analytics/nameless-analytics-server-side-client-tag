@@ -203,7 +203,7 @@ Endpoint path to which requests have to be sent.
 ### Accept requests from authorized domains only
 Set the specific domains from which requests can be claimed.
 
-If the Server-side Google Tag Manager container needs to claim requests from multiple domains, all those domains must be listed in the "Allowed domains" field. Add one domain per row.
+If the Server-side Google Tag Manager container needs to claim requests from multiple domains, all those domains must be listed in the "Authorized domains" field. Add one domain per row.
 
 
 ### Reject requests by IP
